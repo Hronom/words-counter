@@ -16,6 +16,18 @@
     </properties>
 
     <dependencies>
+        <!-- LanguageTool -->
+        <dependency>
+            <groupId>org.languagetool</groupId>
+            <artifactId>language-all</artifactId>
+            <version>3.5</version>
+        </dependency>
+        <!-- Lucene -->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analyzers-common</artifactId>
+            <version>6.2.1</version>
+        </dependency>
         <!-- Spring -->
         <dependency>
             <groupId>org.springframework</groupId>
