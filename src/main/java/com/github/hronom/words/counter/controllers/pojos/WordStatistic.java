@@ -4,12 +4,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class WordStatistic {
     @JsonProperty
-    public final Long textsCount;
+    public final Integer textsCount;
 
     @JsonProperty
-    public final Long requestsCount;
+    public final Integer requestsCount;
 
-    public WordStatistic(Long textsCountArg, Long requestsCountArg) {
+    public WordStatistic(Integer textsCountArg, Integer requestsCountArg) {
         textsCount = textsCountArg;
         requestsCount = requestsCountArg;
     }

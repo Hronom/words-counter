@@ -39,16 +39,16 @@ public class WordsService {
 
 
 
-    public Long getWordTextsCount(String word) {
+    public Integer getWordTextsCount(String word) {
         LongAccumulator longAccumulator = wordsTextsStatistic.get(word);
         if (longAccumulator != null) {
-            return longAccumulator.longValue();
+            return longAccumulator.intValue();
         } else {
-            return 0L;
+            return 0;
         }
     }
 
-    public Long getWordRequestsCount(String word) {
+    public Integer getWordRequestsCount(String word) {
         LongAccumulator longAccumulator = wordsRequestsStatistic.get(word);
         if (longAccumulator == null) {
             LongAccumulator newLongAccumulator = new LongAccumulator(
@@ -63,7 +63,7 @@ public class WordsService {
             }
         }
         longAccumulator.accumulate(1);
-        return longAccumulator.longValue();
+        return longAccumulator.intValue();
     }
 
     protected void loadWordsFromTexts() throws Exception {

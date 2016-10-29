@@ -12,6 +12,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 @RestController
 public class RootController {
     private final WordsService wordsService;
@@ -21,14 +26,26 @@ public class RootController {
         wordsService = wordsServiceArg;
     }
 
+    @ApiOperation(value = "Return statistic for specified word.")
+    @ApiResponses(
+        value = {
+            @ApiResponse(code = 200, message = "Successful."),
+            @ApiResponse(code = 400, message = "Something bad happens.")
+        })
     @RequestMapping(value = "/ask", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
-    public ResponseEntity<WordStatistic> ask(
+    public ResponseEntity ask(
+        @ApiParam(name = "word", value = "must be an English word (case sensitive)", required = true)
         @RequestParam(value = "word", required = true) String word
     ) {
-        return ResponseEntity.ok(new WordStatistic(
-            wordsService.getWordTextsCount(word),
-            wordsService.getWordRequestsCount(word)
-        ));
+        try {
+            WordStatistic wordStatistic = new WordStatistic(
+                wordsService.getWordTextsCount(word),
+                wordsService.getWordRequestsCount(word)
+            );
+            return ResponseEntity.ok(wordStatistic);
+        } catch (Exception exception){
+            return ResponseEntity.badRequest().build();
+        }
     }
 }
