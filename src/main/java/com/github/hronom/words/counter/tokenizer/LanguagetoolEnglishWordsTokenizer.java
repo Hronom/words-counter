@@ -8,7 +8,7 @@ public class LanguagetoolEnglishWordsTokenizer implements EnglishWordsTokenizer 
     private final EnglishWordTokenizer wordTokenizer = new EnglishWordTokenizer();
 
     @Override
-    public List<String> tokenize(String text) {
+    public List<String> tokenize(String text) throws Exception {
         return wordTokenizer.tokenize(text);
     }
 }

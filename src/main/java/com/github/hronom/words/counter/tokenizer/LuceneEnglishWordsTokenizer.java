@@ -17,35 +17,27 @@ public class LuceneEnglishWordsTokenizer implements EnglishWordsTokenizer {
     /**
      * Create empty set of stopwords to override set inside {@link StandardAnalyzer}.
      */
-    public final CharArraySet stopWords = new CharArraySet(0, false);
-    public final Analyzer analyzer = new StandardAnalyzer(stopWords);
+    private final CharArraySet stopWords = new CharArraySet(0, false);
+    private final Analyzer analyzer = new StandardAnalyzer(stopWords);
 
     @Override
-    public List<String> tokenize(String text) {
+    public List<String> tokenize(String text) throws Exception {
         return tokenize(analyzer, text);
     }
 
-    private List<String> tokenize(Analyzer analyzer, String string) {
+    private List<String> tokenize(Analyzer analyzer, String string) throws Exception {
         List<String> result = new ArrayList<>();
-        try {
-            TokenStream stream = analyzer.tokenStream(null, new StringReader(string));
-            stream.reset();
-            while (stream.incrementToken()) {
-                CharTermAttribute charTermAttribute = stream.getAttribute(CharTermAttribute.class);
-                PackedTokenAttributeImpl
-                    packedTokenAttribute
-                    = (PackedTokenAttributeImpl) charTermAttribute;
-                result.add(string.substring(
-                    packedTokenAttribute.startOffset(),
-                    packedTokenAttribute.endOffset()
-                ));
-            }
-            stream.end();
-            stream.close();
-        } catch (IOException e) {
-            // not thrown b/c we're using a string reader...
-            throw new RuntimeException(e);
+        TokenStream stream = analyzer.tokenStream(null, new StringReader(string));
+        stream.reset();
+        while (stream.incrementToken()) {
+            CharTermAttribute charTermAttribute = stream.getAttribute(CharTermAttribute.class);
+            PackedTokenAttributeImpl packedTokenAttribute =
+                (PackedTokenAttributeImpl) charTermAttribute;
+            result.add(string
+                .substring(packedTokenAttribute.startOffset(), packedTokenAttribute.endOffset()));
         }
+        stream.end();
+        stream.close();
         return result;
     }
 }

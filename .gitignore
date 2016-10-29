@@ -113,6 +113,7 @@ local.properties
 
 # Code Recommenders
 .recommenders/
+
 ### Maven template
 target/
 pom.xml.tag
@@ -123,6 +124,7 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
+
 ### NetBeans template
 nbproject/private/
 build/
@@ -132,3 +134,5 @@ nbdist/
 nbactions.xml
 .nb-gradle/
 
+### Exclude
+bin/texts/**
