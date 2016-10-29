@@ -67,10 +67,11 @@ public class WordsService {
     }
 
     protected void loadWordsFromTexts() throws Exception {
+        long startTime = System.currentTimeMillis();
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(textsPath, "*.txt")) {
             for (Path path : stream) {
                 if (Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS) && !Files.isHidden(path)) {
-                    logger.info("Loading \"" + path + "\"...");
+                    logger.info("Loading words from \"" + path + "\"...");
                     String text = new String(Files.readAllBytes(path));
                     List<String> words = tokenizeWord(text);
                     for (String word : words) {
@@ -79,6 +80,8 @@ public class WordsService {
                 }
             }
         }
+        long endTime = System.currentTimeMillis();
+        logger.info("Total loading time " + (endTime - startTime) + " ms.");
     }
 
     protected List<String> tokenizeWord(String word) throws Exception {
