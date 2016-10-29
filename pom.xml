@@ -218,7 +218,7 @@
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib</classpathPrefix>
                             <classpathLayoutType>simple</classpathLayoutType>
-                            <mainClass>com.github.hronom.words.counter.App</mainClass>
+                            <mainClass>com.github.hronom.words.counter.WordsCounterApp</mainClass>
                         </manifest>
                         <manifestEntries>
                             <Version>${project.version}</Version>
