@@ -3,6 +3,7 @@ package com.github.hronom.words.counter.controllers;
 import com.github.hronom.words.counter.controllers.pojos.WordStatistic;
 import com.github.hronom.words.counter.services.WordsService;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +46,7 @@ public class RootController {
             );
             return ResponseEntity.ok(wordStatistic);
         } catch (Exception exception){
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(ExceptionUtils.getStackTrace(exception));
         }
     }
 }
