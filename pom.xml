@@ -290,7 +290,6 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.6</version>
                 <configuration>
-                    <finalName>${project.artifactId}</finalName>
                     <!-- why need appendAssemblyId http://stackoverflow.com/a/20697237/285571 -->
                     <appendAssemblyId>false</appendAssemblyId>
                     <descriptors>
