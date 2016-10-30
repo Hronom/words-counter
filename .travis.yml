@@ -6,7 +6,7 @@ env:
     - APP_VERSION=$(mvn -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive org.codehaus.mojo:exec-maven-plugin:1.4.0:exec)
 
 deploy:
-  provider: releasess
+  provider: releases
   api_key: $GITHUB_TOKEN
   file:
     - "words-counter/dist/words-counter-$APP_VERSION.zip"
