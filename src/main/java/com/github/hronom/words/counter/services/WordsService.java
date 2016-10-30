@@ -5,8 +5,14 @@ import com.github.hronom.words.counter.tokenizer.LuceneEnglishWordsTokenizer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.parser.AutoDetectParser;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.sax.BodyContentHandler;
 import org.springframework.stereotype.Service;
+import org.xml.sax.ContentHandler;
 
+import java.io.InputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -68,14 +74,29 @@ public class WordsService {
 
     protected void loadWordsFromTexts() throws Exception {
         long startTime = System.currentTimeMillis();
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(textsPath, "*.txt")) {
-            for (Path path : stream) {
+        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(textsPath, "*.txt")) {
+            for (Path path : directoryStream) {
                 if (Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS) && !Files.isHidden(path)) {
                     logger.info("Loading words from \"" + path + "\"...");
-                    String text = new String(Files.readAllBytes(path));
-                    List<String> words = tokenizeWord(text);
-                    for (String word : words) {
-                        addWordToMap(word);
+                    try (InputStream stream = Files.newInputStream(path)) {
+                        ContentHandler handler = new BodyContentHandler(-1);
+                        AutoDetectParser parser = new AutoDetectParser();
+                        Metadata metadata = new Metadata();
+                        ParseContext context = new ParseContext();
+                        parser.parse(stream, handler, metadata, context);
+                        String text = handler.toString();
+                        logger.info(
+                            "Content type of file \"" +
+                            path +
+                            "\" - \"" +
+                            metadata.get(Metadata.CONTENT_TYPE) +
+                            "\""
+                        );
+
+                        List<String> words = tokenizeWord(text);
+                        for (String word : words) {
+                            addWordToMap(word);
+                        }
                     }
                 }
             }
