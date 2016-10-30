@@ -29,7 +29,7 @@ public class SwaggerConfig {
     private ApiInfo apiInfo() {
         return new ApiInfo(
             "Words Counter REST API",
-            "Calculate how often words appears in base texts and how often users asks for word.",
+            "Calculate how often words appear in base texts and how often users asks for word.",
             "1.0.0",
             "http://www.apache.org/licenses/#2.0",
             new Contact("Eugene Tenkaev", "https://github.com/Hronom", "hronom@gmail.com"),
