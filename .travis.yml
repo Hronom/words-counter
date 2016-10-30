@@ -9,7 +9,7 @@ deploy:
   provider: releases
   api_key: $GITHUB_TOKEN
   file:
-    - "words-counter/dist/words-counter-$APP_VERSION.zip"
+    - "dist/words-counter-$APP_VERSION.zip"
   skip_cleanup: true
   on:
     tags: true
