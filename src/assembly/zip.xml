@@ -9,6 +9,15 @@
     <fileSets>
         <fileSet>
             <directory>${project.basedir}/bin</directory>
+            <outputDirectory/>
+            <excludes>
+                <exclude>logs/**</exclude>
+                <exclude>texts/**</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/texts</directory>
+            <outputDirectory>texts</outputDirectory>
             <excludes>
                 <exclude>logs/**</exclude>
             </excludes>
