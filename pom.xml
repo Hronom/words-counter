@@ -16,11 +16,11 @@
     </properties>
 
     <dependencies>
-        <!-- LanguageTool -->
+        <!-- commons -->
         <dependency>
-            <groupId>org.languagetool</groupId>
-            <artifactId>language-all</artifactId>
-            <version>3.5</version>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
         </dependency>
         <!-- Lucene -->
         <dependency>
