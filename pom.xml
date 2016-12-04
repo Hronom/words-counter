@@ -320,7 +320,7 @@
                     <!-- why need appendAssemblyId http://stackoverflow.com/a/20697237/285571 -->
                     <appendAssemblyId>false</appendAssemblyId>
                     <descriptors>
-                        <descriptor>src/assembly/zip.xml</descriptor>
+                        <descriptor>assembly-zip.xml</descriptor>
                     </descriptors>
                     <outputDirectory>${project.basedir}/dist</outputDirectory>
                 </configuration>
