@@ -27,6 +27,18 @@ public class RootController {
         wordsService = wordsServiceArg;
     }
 
+    @ApiOperation(value = "Return link to the SWAGGER UI.")
+    @ApiResponses(
+        value = {
+            @ApiResponse(code = 200, message = "Successful."),
+            @ApiResponse(code = 400, message = "Something bad happens.")
+        })
+    @RequestMapping(value = "/", method = {RequestMethod.GET}, produces = MediaType.TEXT_HTML_VALUE)
+    @ResponseBody
+    public ResponseEntity root() {
+        return ResponseEntity.ok("<a href=\"/swagger-ui.html#!\">SWAGGER UI</a>");
+    }
+
     @ApiOperation(value = "Return statistic for specified word.")
     @ApiResponses(
         value = {
