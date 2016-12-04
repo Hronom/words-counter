@@ -9,8 +9,17 @@ RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true 
 RUN apt-get install oracle-java8-installer -y
 RUN apt-get install -y maven
 
+COPY . /app
+COPY texts /app/bin/texts
+
+WORKDIR /app
+
+RUN APP_VERSION=$(mvn org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate -Dexpression=project.version|grep -Ev '(^\[|Download\w+:)')
+
 RUN mvn clean install
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "bin/words-counter-1.1.0.jar"]
+WORKDIR /app/bin
+
+ENTRYPOINT ["java", "-jar", "bin/words-counter-$APP_VERSION.jar"]
