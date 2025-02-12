@@ -1,49 +1,48 @@
 package com.github.hronom.words.counter.services;
 
+import com.github.hronom.words.counter.properties.WordsCounterServiceProperties;
 import com.github.hronom.words.counter.tokenizer.EnglishWordsTokenizer;
 import com.github.hronom.words.counter.tokenizer.LuceneEnglishWordsTokenizer;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.sax.BodyContentHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.xml.sax.ContentHandler;
 
 import java.io.InputStream;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.lang.invoke.MethodHandles;
+import java.nio.file.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.LongAccumulator;
 
 @Service
-public class WordsService {
-    private static final Logger logger = LogManager.getLogger();
+public class WordsService implements InitializingBean {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final Path textsPath = Paths.get("texts");
+    private final WordsCounterServiceProperties wordsCounterServiceProperties;
 
     private final EnglishWordsTokenizer englishWordsTokenizer = new LuceneEnglishWordsTokenizer();
 
-    private ConcurrentHashMap<String, LongAccumulator>
-        wordsTextsStatistic
-        = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<String, LongAccumulator>
-        wordsRequestsStatistic
-        = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, LongAccumulator> wordsTextsStatistic = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, LongAccumulator> wordsRequestsStatistic = new ConcurrentHashMap<>();
 
-    public WordsService() throws Exception {
-        loadWordsFromTexts();
-        logger.info("wordsTextsStatistic map size: " + wordsTextsStatistic.size());
-        logger.info("wordsRequestsStatistic map size: " + wordsRequestsStatistic.size());
+    @Autowired
+    public WordsService(WordsCounterServiceProperties wordsCounterServiceProperties) {
+        this.wordsCounterServiceProperties = wordsCounterServiceProperties;
     }
 
-
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        loadWordsFromTexts();
+        LOGGER.info("wordsTextsStatistic map size: {}", wordsTextsStatistic.size());
+        LOGGER.info("wordsRequestsStatistic map size: {}", wordsRequestsStatistic.size());
+    }
 
     public Integer getWordTextsCount(String word) {
         LongAccumulator longAccumulator = wordsTextsStatistic.get(word);
@@ -58,8 +57,8 @@ public class WordsService {
         LongAccumulator longAccumulator = wordsRequestsStatistic.get(word);
         if (longAccumulator == null) {
             LongAccumulator newLongAccumulator = new LongAccumulator(
-                (left, right) -> left + right,
-                0
+                    Long::sum,
+                    0
             );
             // Race condition can occur when two threads try to create value, and one goes faster
             // and increase value in accumulator while another thread can replace it by 0.
@@ -74,10 +73,13 @@ public class WordsService {
 
     protected void loadWordsFromTexts() throws Exception {
         long startTime = System.currentTimeMillis();
-        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(textsPath, "*.txt")) {
+        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(
+                Paths.get(wordsCounterServiceProperties.getTextsFolderPath()),
+                "*.txt"
+        )) {
             for (Path path : directoryStream) {
                 if (Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS) && !Files.isHidden(path)) {
-                    logger.info("Loading words from \"" + path + "\"...");
+                    LOGGER.info("Loading words from '{}'...", path);
                     try (InputStream stream = Files.newInputStream(path)) {
                         ContentHandler handler = new BodyContentHandler(-1);
                         AutoDetectParser parser = new AutoDetectParser();
@@ -85,13 +87,7 @@ public class WordsService {
                         ParseContext context = new ParseContext();
                         parser.parse(stream, handler, metadata, context);
                         String text = handler.toString();
-                        logger.info(
-                            "Content type of file \"" +
-                            path +
-                            "\" - \"" +
-                            metadata.get(Metadata.CONTENT_TYPE) +
-                            "\""
-                        );
+                        LOGGER.info("Content type of file '{}' - '{}'", path, metadata.get(Metadata.CONTENT_TYPE));
 
                         List<String> words = tokenizeWord(text);
                         for (String word : words) {
@@ -102,7 +98,7 @@ public class WordsService {
             }
         }
         long endTime = System.currentTimeMillis();
-        logger.info("Total loading time " + (endTime - startTime) + " ms.");
+        LOGGER.info("Total loading time {} ms.", endTime - startTime);
     }
 
     protected List<String> tokenizeWord(String word) throws Exception {
@@ -112,9 +108,9 @@ public class WordsService {
     protected void addWordToMap(String word) {
         LongAccumulator longAccumulator = wordsTextsStatistic.get(word);
         if (longAccumulator == null) {
-            longAccumulator = new LongAccumulator((left, right) -> left + right, 0);
+            longAccumulator = new LongAccumulator(Long::sum, 0);
             wordsTextsStatistic.put(word, longAccumulator);
-            wordsRequestsStatistic.put(word, new LongAccumulator((left, right) -> left + right, 0));
+            wordsRequestsStatistic.put(word, new LongAccumulator(Long::sum, 0));
         }
         longAccumulator.accumulate(1);
     }
