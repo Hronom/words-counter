@@ -1,0 +1,2 @@
+words-counter-service:
+  textsFolderPath: "testTexts"
